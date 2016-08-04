@@ -1,12 +1,23 @@
-*.class
-
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Compiled Java Files #
 *.jar
 *.war
 *.ear
+*.zip
+*.class
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# VM Crashlogs #
 hs_err_pid*
+
+# Eclipse #
+/bin/
+/.settings/
+/.externalToolBuilders/
+.classpath
+.project
+build.xml
+
+# Others #
+*.db
