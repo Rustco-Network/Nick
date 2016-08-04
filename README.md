@@ -1,2 +1,2 @@
 # Nick
-Nick Plugin
+The Nick-Plugin made by ThexXTURBOXx and Sensetox
