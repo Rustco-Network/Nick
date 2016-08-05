@@ -1,0 +1,5 @@
+name: Nick
+main: de.thexxturboxx.nick.Nick
+version: 1.0.0
+author: ThexXTURBOXx
+depend: [NickNamer]
