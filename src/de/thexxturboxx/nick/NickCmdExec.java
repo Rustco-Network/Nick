@@ -1,13 +1,11 @@
 package de.thexxturboxx.nick;
 
-import java.util.Random;
-
 import org.bukkit.ChatColor;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.inventivetalent.nicknamer.NickNamerPlugin;
 import org.inventivetalent.nicknamer.api.NickNamerAPI;
 
 public class NickCmdExec implements CommandExecutor {
@@ -24,11 +22,10 @@ public class NickCmdExec implements CommandExecutor {
 			Player p = (Player) sender;
 			if(p.hasPermission("nick.cmd.nick") || p.isOp()) {
 				if(args.length == 0) {
-					int lengthArray = plugin.getServer().getOfflinePlayers().length;
-					OfflinePlayer disguise = plugin.getServer().getOfflinePlayers()[new Random().nextInt(lengthArray)];
-					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), disguise.getName());
-					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), disguise.getName());
-					p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du spielst nun als" + ChatColor.GRAY + ": " + ChatColor.GOLD + disguise.getName());
+					String randomName;
+					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), randomName = getRandomName());
+					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), randomName);
+					p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du spielst nun als" + ChatColor.GRAY + ": " + ChatColor.GOLD + randomName);
 				} else if(args.length == 1) {
 					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), args[0]);
 					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), args[0]);
@@ -43,6 +40,14 @@ public class NickCmdExec implements CommandExecutor {
 			plugin.getServer().getLogger().info("Das kann nur ein Spieler machen, du Schlingel ;)");
 		}
 		return true;
+	}
+	
+	private String getRandomName() {
+		String randomName = NickNamerAPI.getRandomNick(NickNamerPlugin.instance.randomNicks.get("__default__"));
+		if(NickNamerPlugin.instance.randomSkins.get("__default__").contains(randomName)) {
+			return randomName;
+		}
+		return getRandomName();
 	}
 	
 }
