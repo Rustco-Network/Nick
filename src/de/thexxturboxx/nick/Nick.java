@@ -30,9 +30,9 @@ public class Nick extends JavaPlugin {
 		} catch (Exception e){
 			e.printStackTrace();
 		}
-		NickCmd cmd = new NickCmd(this);
-		cmap.register("", cmd);
-		cmd.setExecutor(new NickCmdExec(this));
+		NickCmd cmd_nick = new NickCmd(this);
+		cmap.register("", cmd_nick);
+		cmd_nick.setExecutor(new NickCmdExec(this));
 	}
 	
 	@Override
