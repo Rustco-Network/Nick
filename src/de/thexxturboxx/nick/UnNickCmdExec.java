@@ -22,7 +22,7 @@ public class UnNickCmdExec implements CommandExecutor {
 			if(p.hasPermission("nick.cmd.unnick") || p.isOp()) {
 				if(NickNamerAPI.getNickManager().isNicked(p.getUniqueId())) {
 					if(args.length == 0) {
-						p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du wurdest erfolgreich unnicked!");
+						p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du wurdest erfolgreich entnicked!");
 						NickNamerAPI.getNickManager().removeNick(p.getUniqueId());
 						NickNamerAPI.getNickManager().removeSkin(p.getUniqueId());
 					} else {
