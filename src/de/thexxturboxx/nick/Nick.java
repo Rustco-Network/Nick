@@ -33,6 +33,9 @@ public class Nick extends JavaPlugin {
 		NickCmd cmd_nick = new NickCmd(this);
 		cmap.register("", cmd_nick);
 		cmd_nick.setExecutor(new NickCmdExec(this));
+		UnNickCmd cmd_unnick = new UnNickCmd(this);
+		cmap.register("", cmd_unnick);
+		cmd_unnick.setExecutor(new UnNickCmdExec(this));
 	}
 	
 	@Override
