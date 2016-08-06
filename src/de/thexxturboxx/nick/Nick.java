@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,7 +26,7 @@ public class Nick extends JavaPlugin {
 			if(Bukkit.getServer() instanceof CraftServer) {
 				final Field f = CraftServer.class.getDeclaredField("commandMap");
 				f.setAccessible(true);
-				cmap = (CommandMap)f.get(Bukkit.getServer());
+				cmap = (CommandMap) f.get(Bukkit.getServer());
 			}
 		} catch (Exception e){
 			e.printStackTrace();
@@ -62,6 +63,10 @@ public class Nick extends JavaPlugin {
 	
 	public static File getDataPath() {
 		return dataPath;
+	}
+	
+	public static String getPrefix() {
+		return ChatColor.GRAY + "[" + ChatColor.DARK_PURPLE + "NICK" + ChatColor.GRAY + "] ";
 	}
 	
 	public static double round(double value, int decimal) {

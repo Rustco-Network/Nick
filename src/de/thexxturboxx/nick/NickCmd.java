@@ -12,7 +12,7 @@ public class NickCmd extends Command {
 	CommandExecutor exe = null;
 	
 	public NickCmd(Nick plugin) {
-		super("nick", "Sich nicken", "/nick", Arrays.asList(new String[]{}));
+		super("xnick", "Sich nicken", "/xnick", Arrays.asList(new String[]{}));
 		this.plugin = plugin;
 	}
 	

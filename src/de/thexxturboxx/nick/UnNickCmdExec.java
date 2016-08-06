@@ -19,19 +19,20 @@ public class UnNickCmdExec implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(sender instanceof Player) {
 			Player p = (Player) sender;
-			if(p.hasPermission("nick.cmd.unnick")) {
+			if(p.hasPermission("nick.cmd.unnick") || p.isOp()) {
 				if(NickNamerAPI.getNickManager().isNicked(p.getUniqueId())) {
 					if(args.length == 0) {
+						p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du wurdest erfolgreich unnicked!");
 						NickNamerAPI.getNickManager().removeNick(p.getUniqueId());
 						NickNamerAPI.getNickManager().removeSkin(p.getUniqueId());
 					} else {
-						p.sendMessage(ChatColor.RED + "Nutze /unnick");
+						p.sendMessage(ChatColor.DARK_RED + "Nutze /xunnick");
 					}
 				} else {
-					p.sendMessage(ChatColor.RED + "Du bist nicht genickt!");
+					p.sendMessage(ChatColor.DARK_RED + "Du bist nicht genickt!");
 				}
 			} else {
-				p.sendMessage(ChatColor.RED + "Dazu hast du keine Erlaubnis!");
+				p.sendMessage(ChatColor.DARK_RED + "Dazu hast du keine Erlaubnis!");
 			}
 		} else {
 			plugin.getServer().getLogger().info("Das kann nur ein Spieler machen, du Schlingel ;)");
