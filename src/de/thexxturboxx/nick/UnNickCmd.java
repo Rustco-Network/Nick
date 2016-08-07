@@ -12,7 +12,7 @@ public class UnNickCmd extends Command {
 	CommandExecutor exe = null;
 	
 	public UnNickCmd(Nick plugin) {
-		super("xunnick", "Sich unnicken", "/xunnick", Arrays.asList(new String[]{}));
+		super("unnick", "Sich unnicken", "/unnick", Arrays.asList(new String[]{}));
 		this.plugin = plugin;
 	}
 	

@@ -2,15 +2,23 @@ package de.thexxturboxx.nick;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.BanList.Type;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.inventivetalent.nicknamer.api.NickNamerAPI;
 
-public class Nick extends JavaPlugin {
+public class Nick extends JavaPlugin implements Listener {
 	
 	public static Nick instance;
 	public static File path = new File("plugins/Nick"), dataPath;
@@ -37,6 +45,7 @@ public class Nick extends JavaPlugin {
 		UnNickCmd cmd_unnick = new UnNickCmd(this);
 		cmap.register("", cmd_unnick);
 		cmd_unnick.setExecutor(new UnNickCmdExec(this));
+		getServer().getPluginManager().registerEvents(this, this);
 	}
 	
 	@Override
@@ -72,4 +81,40 @@ public class Nick extends JavaPlugin {
 	public static double round(double value, int decimal) {
 	    return (double) Math.round(value * Math.pow(10d, decimal)) / Math.pow(10d, decimal);
 	}
+	
+	@EventHandler
+	public void adminTabComplete(PlayerChatTabCompleteEvent e) {
+		if(e.getPlayer().hasPermission("nick.chat.admintab") || e.getPlayer().isOp()) {
+			String message = e.getChatMessage();
+			Collection<String> nickedPlayers = NickNamerAPI.getNickManager().getUsedNicks();
+			List<String> newMessages = new ArrayList<String>();
+			for(String nickName : nickedPlayers) {
+				if(startsWithIgnoreCase(nickName, message))
+					newMessages.add(nickName);
+			}
+			for(Player p : getServer().getOnlinePlayers()) {
+				String name = p.getName();
+				if(!newMessages.contains(name) && !inCollectionStartsWithIgnoreCase(nickedPlayers, message))
+					newMessages.add(name);
+			}
+			e.getTabCompletions().clear();
+			for(String nickName : newMessages) {
+				e.getTabCompletions().add(nickName);
+			}
+		}
+	}
+	
+	private boolean inCollectionStartsWithIgnoreCase(Collection<String> c, String toSearch) {
+		for(String s : c) {
+			if(startsWithIgnoreCase(s, toSearch))
+				return true;
+		}
+		return false;
+	}
+	
+	private boolean startsWithIgnoreCase(String s1, String s2) {
+		return s1.length() >= s2.length() &&
+				s1.substring(0, s2.length()).equalsIgnoreCase(s2);
+	}
+	
 }
