@@ -19,6 +19,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatTabCompleteEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.inventivetalent.nicknamer.api.NickNamerAPI;
 
@@ -121,19 +123,50 @@ public class Nick extends JavaPlugin implements Listener {
 	public void playerJoin(PlayerJoinEvent e) {
 		if(e.getPlayer().hasPermission("nick.cmd.nick")) {
 			try {
+				Player p = e.getPlayer();
 				Statement s = c.createStatement();
-				ResultSet res = s.executeQuery("SELECT * FROM " + TABLE + " WHERE UUID = '" + e.getPlayer().getUniqueId().toString() + "';");
+				ResultSet res = s.executeQuery("SELECT * FROM " + TABLE + " WHERE UUID = '" + p.getName() + "';");
 				boolean nicked = false;
 				if(res.next()) {
 					nicked = res.getBoolean("nicked");
 				}
 				if(nicked) {
-					String randomName = NickCmdExec.getRandomName(this, e.getPlayer().getName());
-					e.setJoinMessage(e.getJoinMessage().replace(e.getPlayer().getName(), randomName));
-					getServer().dispatchCommand(e.getPlayer(), "xnick " + randomName);
+					String randomName = NickCmdExec.getRandomName(this, p.getName());
+					String joinMsg = e.getJoinMessage();
+					System.out.println(randomName);
+					System.out.println(joinMsg);
+					joinMsg = joinMsg.replace(p.getName(), randomName);
+					e.setJoinMessage(joinMsg);
+					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), randomName);
+					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), randomName);
+					p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du spielst nun als" + ChatColor.GRAY + ": " + ChatColor.GOLD + randomName);
 				}
 			} catch(Exception e1) {
 				e1.printStackTrace();
+			}
+		}
+	}
+	
+	@EventHandler
+	public void playerLeave(PlayerQuitEvent e) {
+		if(e.getPlayer().hasPermission("nick.cmd.unnick")) {
+			if(NickNamerAPI.getNickManager().isNicked(e.getPlayer().getUniqueId())) {
+				NickNamerAPI.getNickManager().removeNick(e.getPlayer().getUniqueId());
+			}
+			if(NickNamerAPI.getNickManager().hasSkin(e.getPlayer().getUniqueId())) {
+				NickNamerAPI.getNickManager().removeSkin(e.getPlayer().getUniqueId());
+			}
+		}
+	}
+	
+	@EventHandler
+	public void playerLeave(PlayerKickEvent e) {
+		if(e.getPlayer().hasPermission("nick.cmd.unnick")) {
+			if(NickNamerAPI.getNickManager().isNicked(e.getPlayer().getUniqueId())) {
+				NickNamerAPI.getNickManager().removeNick(e.getPlayer().getUniqueId());
+			}
+			if(NickNamerAPI.getNickManager().hasSkin(e.getPlayer().getUniqueId())) {
+				NickNamerAPI.getNickManager().removeSkin(e.getPlayer().getUniqueId());
 			}
 		}
 	}

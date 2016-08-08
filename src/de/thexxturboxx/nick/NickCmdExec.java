@@ -55,7 +55,8 @@ public class NickCmdExec implements CommandExecutor {
 		if(NickNamerPlugin.instance.randomSkins.get("__default__").contains(randomName) &&
 				!randomName.equals(notTake) &&
 				!plugin.getServer().getOnlinePlayers().contains(plugin.getServer().getPlayer(randomName)) &&
-				NickNamerAPI.getNickManager().getPlayersWithNick(randomName).isEmpty())
+				NickNamerAPI.getNickManager().getPlayersWithNick(randomName).isEmpty() &&
+				randomName != null)
 			return randomName;
 		return getRandomName(plugin, notTake);
 	}
