@@ -132,11 +132,7 @@ public class Nick extends JavaPlugin implements Listener {
 				}
 				if(nicked) {
 					String randomName = NickCmdExec.getRandomName(this, p.getName());
-					String joinMsg = e.getJoinMessage();
-					System.out.println(randomName);
-					System.out.println(joinMsg);
-					joinMsg = joinMsg.replace(p.getName(), randomName);
-					e.setJoinMessage(joinMsg);
+					e.setJoinMessage("§bhFFA §7| §6" + randomName + " §ahat FFA betreten!");
 					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), randomName);
 					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), randomName);
 					p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du spielst nun als" + ChatColor.GRAY + ": " + ChatColor.GOLD + randomName);
@@ -157,6 +153,7 @@ public class Nick extends JavaPlugin implements Listener {
 				NickNamerAPI.getNickManager().removeSkin(e.getPlayer().getUniqueId());
 			}
 		}
+		e.setQuitMessage("§bhFFA §7| §6" + NickNamerAPI.getNickManager().getNick(e.getPlayer().getUniqueId()) + " §ahat FFA verlassen!");
 	}
 	
 	@EventHandler
@@ -169,6 +166,7 @@ public class Nick extends JavaPlugin implements Listener {
 				NickNamerAPI.getNickManager().removeSkin(e.getPlayer().getUniqueId());
 			}
 		}
+		e.setLeaveMessage("§bhFFA §7| §6" + NickNamerAPI.getNickManager().getNick(e.getPlayer().getUniqueId()) + " §ahat FFA verlassen!");
 	}
 	
 	@EventHandler
