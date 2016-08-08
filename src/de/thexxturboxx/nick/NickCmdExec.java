@@ -23,7 +23,7 @@ public class NickCmdExec implements CommandExecutor {
 			if(p.hasPermission("nick.cmd.nick") || p.isOp()) {
 				if(args.length == 0) {
 					String randomName;
-					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), randomName = getRandomName(p.getName()));
+					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), randomName = getRandomName(plugin, p.getName()));
 					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), randomName);
 					p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du spielst nun als" + ChatColor.GRAY + ": " + ChatColor.GOLD + randomName);
 				} else if(args.length == 1) {
@@ -50,14 +50,14 @@ public class NickCmdExec implements CommandExecutor {
 		return true;
 	}
 	
-	private String getRandomName(String notTake) {
+	public static String getRandomName(Nick plugin, String notTake) {
 		String randomName = NickNamerAPI.getRandomNick(NickNamerPlugin.instance.randomNicks.get("__default__"));
 		if(NickNamerPlugin.instance.randomSkins.get("__default__").contains(randomName) &&
 				!randomName.equals(notTake) &&
 				!plugin.getServer().getOnlinePlayers().contains(plugin.getServer().getPlayer(randomName)) &&
 				NickNamerAPI.getNickManager().getPlayersWithNick(randomName).isEmpty())
 			return randomName;
-		return getRandomName(notTake);
+		return getRandomName(plugin, notTake);
 	}
 	
 }

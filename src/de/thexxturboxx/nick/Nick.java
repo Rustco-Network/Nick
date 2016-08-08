@@ -2,6 +2,9 @@ package de.thexxturboxx.nick;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,14 +18,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerChatTabCompleteEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.inventivetalent.nicknamer.api.NickNamerAPI;
+
+import com.huskehhh.mysql.mysql.MySQL;
 
 public class Nick extends JavaPlugin implements Listener {
 	
 	public static Nick instance;
 	public static File path = new File("plugins/Nick"), dataPath;
     private static CommandMap cmap;
+	MySQL MySQL = null;
+    Connection c = null;
+    public static final String TABLE = "AutoNick",
+    		DATABASE = "AutoNick";
 	
 	public static Nick getInstance() {
 		return instance;
@@ -30,6 +40,26 @@ public class Nick extends JavaPlugin implements Listener {
 	
 	@Override
 	public void onEnable() {
+		loadConfiguration();
+		try {
+			if(!getConfig().contains("MySQL.hostname") || getConfig().getString("MySQL.hostname").equals("null")) {
+				set("MySQL.hostname", "null");
+				set("MySQL.port", "null");
+				set("MySQL.username", "null");
+				set("MySQL.password", "null");
+				getServer().getLogger().info("Bitte gib Deine MySQL-Daten in der Config ein!");
+				getServer().shutdown();
+			} else {
+				MySQL = new MySQL(getConfig().getString("MySQL.hostname"),
+								  getConfig().getString("MySQL.port"),
+								  DATABASE,
+								  getConfig().getString("MySQL.username"),
+								  getConfig().getString("MySQL.password"));
+				c = MySQL.openConnection();
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		try {
 			if(Bukkit.getServer() instanceof CraftServer) {
 				final Field f = CraftServer.class.getDeclaredField("commandMap");
@@ -51,6 +81,11 @@ public class Nick extends JavaPlugin implements Listener {
 	@Override
 	public void onDisable() {
 		
+	}
+	
+	public void set(String key, Object value) {
+		getConfig().set(key, value);
+		saveConfig();
 	}
 	
 	public void loadConfiguration() {
@@ -80,6 +115,27 @@ public class Nick extends JavaPlugin implements Listener {
 	
 	public static double round(double value, int decimal) {
 	    return (double) Math.round(value * Math.pow(10d, decimal)) / Math.pow(10d, decimal);
+	}
+	
+	@EventHandler
+	public void playerJoin(PlayerJoinEvent e) {
+		if(e.getPlayer().hasPermission("nick.cmd.nick")) {
+			try {
+				Statement s = c.createStatement();
+				ResultSet res = s.executeQuery("SELECT * FROM " + TABLE + " WHERE UUID = '" + e.getPlayer().getUniqueId().toString() + "';");
+				boolean nicked = false;
+				if(res.next()) {
+					nicked = res.getBoolean("nicked");
+				}
+				if(nicked) {
+					String randomName = NickCmdExec.getRandomName(this, e.getPlayer().getName());
+					e.setJoinMessage(e.getJoinMessage().replace(e.getPlayer().getName(), randomName));
+					getServer().dispatchCommand(e.getPlayer(), "xnick " + randomName);
+				}
+			} catch(Exception e1) {
+				e1.printStackTrace();
+			}
+		}
 	}
 	
 	@EventHandler
