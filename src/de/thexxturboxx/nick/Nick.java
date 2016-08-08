@@ -28,6 +28,10 @@ import com.huskehhh.mysql.mysql.MySQL;
 
 public class Nick extends JavaPlugin implements Listener {
 	
+	//0 = FALSE
+	//1 = RANDOM
+	//2 = NAME
+	
 	public static Nick instance;
 	public static File path = new File("plugins/Nick"), dataPath;
     private static CommandMap cmap;
@@ -68,7 +72,7 @@ public class Nick extends JavaPlugin implements Listener {
 				f.setAccessible(true);
 				cmap = (CommandMap) f.get(Bukkit.getServer());
 			}
-		} catch (Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		NickCmd cmd_nick = new NickCmd(this);
@@ -126,21 +130,28 @@ public class Nick extends JavaPlugin implements Listener {
 				Player p = e.getPlayer();
 				Statement s = c.createStatement();
 				ResultSet res = s.executeQuery("SELECT * FROM " + TABLE + " WHERE UUID = '" + p.getName() + "';");
-				boolean nicked = false;
-				if(res.next()) {
-					nicked = res.getBoolean("nicked");
-				}
-				if(nicked) {
+				int nicked = 0;
+				if(res.next())
+					nicked = res.getInt("nicked");
+				if(nicked == 0)
+					e.setJoinMessage("§bhFFA §7| §6" + e.getPlayer().getName() + " §ahat FFA betreten!");
+				else if(nicked == 1) {
 					String randomName = NickCmdExec.getRandomName(this, p.getName());
 					e.setJoinMessage("§bhFFA §7| §6" + randomName + " §ahat FFA betreten!");
 					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), randomName);
 					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), randomName);
 					p.sendMessage(Nick.getPrefix() + ChatColor.DARK_RED + "Du spielst nun als" + ChatColor.GRAY + ": " + ChatColor.GOLD + randomName);
+				} else if(nicked == 2) {
+					String name = res.getString("name");
+					e.setJoinMessage("§bhFFA §7| §6" + name + " §ahat FFA betreten!");
+					NickNamerAPI.getNickManager().setNick(p.getUniqueId(), name);
+					NickNamerAPI.getNickManager().setSkin(p.getUniqueId(), name);
 				}
 			} catch(Exception e1) {
 				e1.printStackTrace();
 			}
-		}
+		} else
+			e.setJoinMessage("§bhFFA §7| §6" + e.getPlayer().getName() + " §ahat FFA betreten!");
 	}
 	
 	@EventHandler
@@ -148,12 +159,13 @@ public class Nick extends JavaPlugin implements Listener {
 		if(e.getPlayer().hasPermission("nick.cmd.unnick")) {
 			if(NickNamerAPI.getNickManager().isNicked(e.getPlayer().getUniqueId())) {
 				NickNamerAPI.getNickManager().removeNick(e.getPlayer().getUniqueId());
-			}
-			if(NickNamerAPI.getNickManager().hasSkin(e.getPlayer().getUniqueId())) {
+				e.setQuitMessage("§bhFFA §7| §6" + NickNamerAPI.getNickManager().getNick(e.getPlayer().getUniqueId()) + " §ahat FFA verlassen!");
+			} else
+				e.setQuitMessage("§bhFFA §7| §6" + e.getPlayer().getName() + " §ahat FFA verlassen!");
+			if(NickNamerAPI.getNickManager().hasSkin(e.getPlayer().getUniqueId()))
 				NickNamerAPI.getNickManager().removeSkin(e.getPlayer().getUniqueId());
-			}
-		}
-		e.setQuitMessage("§bhFFA §7| §6" + NickNamerAPI.getNickManager().getNick(e.getPlayer().getUniqueId()) + " §ahat FFA verlassen!");
+		} else
+			e.setQuitMessage("§bhFFA §7| §6" + e.getPlayer().getName() + " §ahat FFA verlassen!");
 	}
 	
 	@EventHandler
@@ -161,12 +173,13 @@ public class Nick extends JavaPlugin implements Listener {
 		if(e.getPlayer().hasPermission("nick.cmd.unnick")) {
 			if(NickNamerAPI.getNickManager().isNicked(e.getPlayer().getUniqueId())) {
 				NickNamerAPI.getNickManager().removeNick(e.getPlayer().getUniqueId());
-			}
-			if(NickNamerAPI.getNickManager().hasSkin(e.getPlayer().getUniqueId())) {
+				e.setLeaveMessage("§bhFFA §7| §6" + NickNamerAPI.getNickManager().getNick(e.getPlayer().getUniqueId()) + " §ahat FFA verlassen!");
+			} else
+				e.setLeaveMessage("§bhFFA §7| §6" + e.getPlayer().getName() + " §ahat FFA verlassen!");
+			if(NickNamerAPI.getNickManager().hasSkin(e.getPlayer().getUniqueId()))
 				NickNamerAPI.getNickManager().removeSkin(e.getPlayer().getUniqueId());
-			}
-		}
-		e.setLeaveMessage("§bhFFA §7| §6" + NickNamerAPI.getNickManager().getNick(e.getPlayer().getUniqueId()) + " §ahat FFA verlassen!");
+		} else
+			e.setLeaveMessage("§bhFFA §7| §6" + e.getPlayer().getName() + " §ahat FFA verlassen!");
 	}
 	
 	@EventHandler
@@ -185,17 +198,15 @@ public class Nick extends JavaPlugin implements Listener {
 					newMessages.add(name);
 			}
 			e.getTabCompletions().clear();
-			for(String nickName : newMessages) {
+			for(String nickName : newMessages)
 				e.getTabCompletions().add(nickName);
-			}
 		}
 	}
 	
 	private boolean inCollectionStartsWithIgnoreCase(Collection<String> c, String toSearch) {
-		for(String s : c) {
+		for(String s : c)
 			if(startsWithIgnoreCase(s, toSearch))
 				return true;
-		}
 		return false;
 	}
 	
