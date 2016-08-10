@@ -28,10 +28,6 @@ import com.huskehhh.mysql.mysql.MySQL;
 
 public class Nick extends JavaPlugin implements Listener {
 	
-	//0 = FALSE
-	//1 = RANDOM
-	//2 = NAME
-	
 	public static Nick instance;
 	public static File path = new File("plugins/Nick"), dataPath;
     private static CommandMap cmap;
@@ -129,7 +125,7 @@ public class Nick extends JavaPlugin implements Listener {
 			try {
 				Player p = e.getPlayer();
 				Statement s = c.createStatement();
-				ResultSet res = s.executeQuery("SELECT * FROM " + TABLE + " WHERE UUID = '" + p.getName() + "';");
+				ResultSet res = s.executeQuery("SELECT * FROM " + TABLE + " WHERE UUID = '" + p.getUniqueId().toString() + "';");
 				int nicked = 0;
 				if(res.next())
 					nicked = res.getInt("nicked");
